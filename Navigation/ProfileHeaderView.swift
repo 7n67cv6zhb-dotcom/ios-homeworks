@@ -2,18 +2,24 @@ import UIKit
 
 class ProfileHeaderView: UIView {
 
+    static let avatarSize: CGFloat = 100
+
     private var statusText = ""
 
-    private let avatarImageView: UIImageView = {
+    // Начальное положение аватара. Отключаем их, когда аватар увеличивается
+    private(set) var avatarSmallConstraints: [NSLayoutConstraint] = []
+
+    let avatarImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "avatar") ?? UIImage(systemName: "person.crop.circle.fill")
         imageView.tintColor = .systemGray
         imageView.backgroundColor = .white
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = 50
+        imageView.layer.cornerRadius = ProfileHeaderView.avatarSize / 2
         imageView.layer.borderWidth = 3
         imageView.layer.borderColor = UIColor.white.cgColor
+        imageView.isUserInteractionEnabled = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -86,14 +92,19 @@ class ProfileHeaderView: UIView {
     }
 
     private func setupConstraints() {
-        NSLayoutConstraint.activate([
+        avatarSmallConstraints = [
             avatarImageView.topAnchor.constraint(equalTo: topAnchor, constant: 16),
             avatarImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            avatarImageView.widthAnchor.constraint(equalToConstant: 100),
-            avatarImageView.heightAnchor.constraint(equalToConstant: 100),
+            avatarImageView.widthAnchor.constraint(equalToConstant: ProfileHeaderView.avatarSize),
+            avatarImageView.heightAnchor.constraint(equalToConstant: ProfileHeaderView.avatarSize)
+        ]
+        NSLayoutConstraint.activate(avatarSmallConstraints)
 
+        // Остальные элементы привязаны к самой шапке, а не к аватару,
+        // чтобы не уезжать вслед за ним во время анимации
+        NSLayoutConstraint.activate([
             fullNameLabel.topAnchor.constraint(equalTo: topAnchor, constant: 27),
-            fullNameLabel.leadingAnchor.constraint(equalTo: avatarImageView.trailingAnchor, constant: 16),
+            fullNameLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 132),
             fullNameLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
 
             statusLabel.leadingAnchor.constraint(equalTo: fullNameLabel.leadingAnchor),
@@ -102,10 +113,10 @@ class ProfileHeaderView: UIView {
 
             statusTextField.leadingAnchor.constraint(equalTo: fullNameLabel.leadingAnchor),
             statusTextField.trailingAnchor.constraint(equalTo: fullNameLabel.trailingAnchor),
-            statusTextField.bottomAnchor.constraint(equalTo: avatarImageView.bottomAnchor),
+            statusTextField.topAnchor.constraint(equalTo: topAnchor, constant: 76),
             statusTextField.heightAnchor.constraint(equalToConstant: 40),
 
-            setStatusButton.topAnchor.constraint(equalTo: avatarImageView.bottomAnchor, constant: 16),
+            setStatusButton.topAnchor.constraint(equalTo: topAnchor, constant: 132),
             setStatusButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             setStatusButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
             setStatusButton.heightAnchor.constraint(equalToConstant: 50)
